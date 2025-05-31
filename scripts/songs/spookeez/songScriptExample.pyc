@@ -1,0 +1,11 @@
+def create():
+    print("create")
+
+def update():
+    print("update")
+
+def beatHit():
+    print("Beat" + curBeat)
+
+def stepHit():
+    print("Step" + curStep)
