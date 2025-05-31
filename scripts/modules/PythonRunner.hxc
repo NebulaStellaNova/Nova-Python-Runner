@@ -57,6 +57,28 @@ class Python extends Module {
                 daScript.fromPath(folder + "/" + file);
                 stateScripts.push(daScript);
             }
+            if (currentState == "PlayState") {
+                if (StringTools.endsWith(folder, PlayState.instance.currentSong.id)) {
+                    for (file2 in FileUtil.readDir(folder)) {
+                        if (StringTools.endsWith(file2, ".pyc")) {
+                            var daScript = new PythonScript();
+                            for (i in ReflectUtil.getFieldsOf(FlxG.state)) {
+                                daScript.set(i, ReflectUtil.getField(FlxG.state, i));
+                            }
+                            daScript.fromPath(folder + "/" + file2);
+                            stateScripts.push(daScript);
+                        }
+                    }
+                }
+                if (StringTools.startsWith(file, PlayState.instance.currentSong.id) && StringTools.endsWith(file, ".pyc")) {
+                    var daScript = new PythonScript();
+                    for (i in ReflectUtil.getFieldsOf(FlxG.state)) {
+                        daScript.set(i, ReflectUtil.getField(FlxG.state, i));
+                    }
+                    daScript.fromPath(folder + "/" + file);
+                    stateScripts.push(daScript);
+                }
+            }
         }
     }
 
