@@ -1,0 +1,16 @@
+{
+  "music": "freeplayRandom",
+  "title": "Python parser",
+  "description": "Mod description",
+  "contributors": [
+      {
+          "name": "",
+          "icon": "",
+          "roles": "",
+          "url": ""
+      }
+  ],
+  "api_version": "0.6.4",
+  "mod_version": "1.2.2",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,17 @@
+{
+    "create": {
+        "add": [
+            {
+                "id": "exampleSprite",
+                "class": "FunkinSprite",
+                "x": 0,
+                "y": 0
+            } 
+        ]
+    },
+    "update": {
+        "trace": {
+            "data": "Hello"
+        }
+    }
+}

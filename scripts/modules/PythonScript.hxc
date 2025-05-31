@@ -1,0 +1,147 @@
+import StringTools;
+import flixel.FlxG;
+import funkin.play.PlayState;
+import funkin.util.ReflectUtil;
+import funkin.modding.module.Module;
+import funkin.ui.mainmenu.MainMenuState;
+import haxe.Json;
+
+import funkin.graphics.FunkinSprite;
+
+import funkin.PlayerSettings;
+
+import haxe.Unserializer;
+
+import openfl.net.URLLoader;
+import openfl.net.URLRequest;
+
+import funkin.input.Controls;
+//import sys.net.Host;
+import funkin.modding.base.ScriptedMusicBeatState;
+
+import hscript.Parser;
+import hscript.Interp;
+//import sys.net.Socket;
+
+//import sys.ssl.Socket;
+
+import funkin.util.FileUtil;
+
+import haxe.Log;
+
+class PythonScript extends Module {
+    public var raw:String = ""; // raw script string
+    public var fileName:String;
+
+    private var hscriptInterp = new Interp();
+
+    private var canUpdate = false;
+    
+    public function new() {
+        super('PythonScript');
+        initVars();
+    }
+    
+    private function new_FunkinSprite(x = 0, y = 0) {
+        return new FunkinSprite(x, y);
+    }
+
+    public function initVars() {
+        // -- Variables -- \\
+        hscriptInterp.variables.set("True", true);
+        hscriptInterp.variables.set("False", false);
+
+        //    -- New --    \\
+        hscriptInterp.variables.set("FunkinSprite", new_FunkinSprite);
+
+        //  -- Classes --  \\
+        hscriptInterp.variables.set("Reflect", ReflectUtil);
+        hscriptInterp.variables.set("File", FileUtil);
+        hscriptInterp.variables.set("Paths", Paths);
+        hscriptInterp.variables.set("FlxG", FlxG);
+
+        //  -- Methods --  \\
+        hscriptInterp.variables.set("add", FlxG.state.add);
+        hscriptInterp.variables.set("print", (what)->{
+            Log.trace(fileName + ":" + what);
+        });
+    }
+    
+    public function fromPath(path) {
+        raw = FileUtil.readStringFromPath(path);
+        raw = raw + "\n";
+        raw = raw + "\n";
+        var splitPath = path.split("/");
+        fileName = splitPath[splitPath.length-1];
+        call("onCreate");
+        call("create");
+        canUpdate = true;
+    }
+
+    function onUpdate(event) {
+        super.onUpdate(event);
+        call("onUpdate");
+        call("update");
+    }
+
+    public function call(name, params) {
+        if (!StringTools.contains(raw, "def " + name)) return;
+        var rawLines = raw.split('\n');
+        var isTheFunction = false;
+        var finalString = "";
+        var lineNumber = 1;
+        var funcCount = 0;
+        for (line in rawLines) {
+            var skip = false;
+            var keys = ["def", "if", "else", "while", "try", "except"];
+            var isF = false;
+            for (key in keys) {
+                if (StringTools.startsWith(StringTools.trim(line), key)) {
+                    isF = true;
+                }
+            }
+            if (funcCount != 0 && !(StringTools.startsWith(line, "\t") || StringTools.startsWith(line, "    "))) {
+            //if (funcCount != 0 && isF) {
+                funcCount--;
+                finalString += "}\n";
+                skip = true;
+            }
+            var lineSplit = StringTools.trim(line).split('');
+            //trace(lineSplit);
+            if (lineSplit[lineSplit.length-1] == ":") {
+                funcCount++;
+                var daFunc = StringTools.trim(line);
+                daFunc = StringTools.replace(daFunc, "def", "function");
+                daFunc = StringTools.replace(daFunc, ":", "{\n");
+                finalString += daFunc;
+            } else if (!skip && lineSplit != []) {
+                var daLine = StringTools.trim(line);
+                daLine = StringTools.replace(daLine, "print(", "print(\"" + lineNumber + ": \" + ");
+                if (daLine + ";\n" != ";\n") {
+                    finalString += daLine + ";\n";
+                }
+            }
+            lineNumber++;
+        }
+
+        params = params != null ? params : [];
+        var daCall = "\n" + name + "(";
+        daCall += params.join(", ");
+        daCall += ");";
+        finalString += daCall;
+
+        finalString = StringTools.replace(finalString, "except", "catch");
+        finalString = StringTools.replace(finalString, "#", "//");
+
+        //trace(finalString);
+        hscriptInterp.execute(new Parser().parseString(finalString));
+    }
+
+    public function set(name, value) {
+        hscriptInterp.variables.set(name, value);
+    }
+    public function destroy() {
+        call("destroy");
+        call("onDestory");
+    }
+}
