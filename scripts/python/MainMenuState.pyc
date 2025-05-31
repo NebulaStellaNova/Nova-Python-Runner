@@ -1,7 +1,0 @@
-def create():
-    leftWatermarkText.text += "\nNova Python Runner v0.1"
-    leftWatermarkText.y -= 15
-
-def update():
-    for (item in menuItems.members):
-        item.x = FlxG.width - (item.width/2) - 20

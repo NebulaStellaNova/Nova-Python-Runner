@@ -87,6 +87,7 @@ class PythonScript extends Module {
     public function call(name, params) {
         if (!StringTools.contains(raw, "def " + name)) return;
         var rawLines = raw.split('\n');
+        rawLines.push("");
         var isTheFunction = false;
         var finalString = "";
         var lineNumber = 1;

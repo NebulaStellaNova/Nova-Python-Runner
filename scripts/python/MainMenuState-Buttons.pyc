@@ -1,0 +1,3 @@
+def update():
+    for (item in menuItems.members):
+        item.x = FlxG.width - (item.width/2) - 20

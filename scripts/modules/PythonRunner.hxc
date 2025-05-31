@@ -49,7 +49,7 @@ class Python extends Module {
             if (FileUtil.directoryExists(folder + "/" + file)) {
                 checkDirState(folder + "/" + file);
             }
-            if (file == currentState + ".pyc") {
+            if (StringTools.startsWith(file, currentState) && StringTools.endsWith(file, ".pyc")) {
                 var daScript = new PythonScript();
                 for (i in ReflectUtil.getFieldsOf(FlxG.state)) {
                     daScript.set(i, ReflectUtil.getField(FlxG.state, i));
