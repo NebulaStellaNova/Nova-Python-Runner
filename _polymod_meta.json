@@ -1,13 +1,14 @@
 {
   "music": "freeplayRandom",
-  "title": "Python parser",
-  "description": "Mod description",
+  "title": "Python Parser",
+  "description": "A Python parser and runner for V-Slice.",
   "contributors": [
       {
-          "name": "",
-          "icon": "",
-          "roles": "",
-          "url": ""
+        "name": "Nebula S. Nova",
+        "icon": "nebula",
+        "color": "#9500ff",
+        "roles": "Coder",
+        "url": "https://www.youtube.com/@ChinosModded"
       }
   ],
   "api_version": "0.6.4",
